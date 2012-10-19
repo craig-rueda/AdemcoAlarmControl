@@ -18,3 +18,12 @@ What you'll need to make it work:
 
 Setup:
 
+1) Connect and setup your AD2USB adapter as per manufacturer's directions
+2) Connect adapter via USB to your server's USB port
+3) Install necessary drivers, following Nutech's directions
+4) Take note of the COM port that the adapter uses
+5) Modify the your app container's deviceComPort JNDI setting to reflect the COM port (default is COM4)
+6) Using Ant, package your app into a WAR file
+7) Deploy the WAR to your favorite app server (tested on Tomcat 6/7)
+8) Enjoy!
+9) Check local log files for any issues that may arise
