@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<ws>
+  <!-- note that all properties set here can be overridden on the command line or in local.properties -->
+  <compile>
+  	<java_version>1.6</java_version>
+    <lib>
+    	<elib>${basedir}/elib</elib>
+    	<applib>${basedir}/WebContent/WEB-INF/lib</applib>
+    </lib>
+    <dist>
+      <dir location="${basedir}/dist"/>
+      <war-deploy-web>ROOT</war-deploy-web>
+      <war-web-name>${ws.compile.dist.war-deploy-web}.war</war-web-name>
+      <war-web>${ws.compile.dist.dir}/${ws.compile.dist.war-web-name}</war-web>
+      <path-web>/${ws.compile.dist.war-deploy-web}</path-web>
+
+      <war-deploy-contententry>wellnet-contententry</war-deploy-contententry>
+      <war-contententry-name>${ws.compile.dist.war-deploy-contententry}.war</war-contententry-name>
+
+      <war-contententry>${ws.compile.dist.dir}/${ws.compile.dist.war-contententry-name}</war-contententry>
+      <path-contententry>/${ws.compile.dist.war-deploy-contententry}</path-contententry>
+    </dist>
+    <buildfiles>
+      <dir location="buildfiles"/>
+    </buildfiles>
+    <build>
+      <dir location="classes"/>
+    </build>
+    <temp>
+      <dir location="temp"/>
+    </temp>
+  </compile>
+  <runtime>
+    <loglevel>error</loglevel>
+    <logfile>${catalina.base}/logs/keypad.log</logfile>
+  </runtime>
+</ws>

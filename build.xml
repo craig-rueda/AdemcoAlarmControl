@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+
+<project name="ActivityServer" default="build">
+	<xmlproperty file="build_common_properties.xml" semanticAttributes="true"/>
+    <!-- lets define some paths (source, various jar paths) -->
+    <path id="source-path">
+        <pathelement path="src"/>
+    </path>
+    <!-- all jars -->
+    <path id="external-jars">
+        <fileset dir="${ws.compile.lib.applib}">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${ws.compile.lib.elib}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>            
+    <!-- these jars are used by ant for tasks which are not part of ant core -->
+    <!-- they come from a variety of sources: tomcat, svn and mysql -->
+    <path id="ant-jars">
+        <fileset dir="${ws.compile.lib.elib}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>        
+    <!-- these jars are whats needed for the web application -->
+    <fileset id="app-web-jars" dir="${ws.compile.lib.applib}">
+        <include name="*.jar"/>
+    </fileset>
+    <!-- define ant tasks which are not part of the ant core distribution -->
+    <taskdef name="svn" classname="org.tigris.subversion.svnant.SvnTask" classpathref="ant-jars"/>
+    <taskdef name="tc-deploy" classname="org.apache.catalina.ant.DeployTask" classpathref="ant-jars"/>
+    <taskdef name="tc-list" classname="org.apache.catalina.ant.ListTask" classpathref="ant-jars"/>
+    <taskdef name="tc-reload" classname="org.apache.catalina.ant.ReloadTask" classpathref="ant-jars"/>
+    <taskdef name="tc-resources" classname="org.apache.catalina.ant.ResourcesTask" classpathref="ant-jars"/>
+    <taskdef name="tc-roles" classname="org.apache.catalina.ant.RolesTask" classpathref="ant-jars"/>
+    <taskdef name="tc-start" classname="org.apache.catalina.ant.StartTask" classpathref="ant-jars"/>
+    <taskdef name="tc-stop" classname="org.apache.catalina.ant.StopTask" classpathref="ant-jars"/>
+    <taskdef name="tc-undeploy" classname="org.apache.catalina.ant.UndeployTask" classpathref="ant-jars"/>
+    <taskdef name="tc-validate" classname="org.apache.catalina.ant.ValidatorTask" classpathref="ant-jars"/>
+    <taskdef name="tc-serverinfo" classname="org.apache.catalina.ant.ServerinfoTask" classpathref="ant-jars"/>
+    <taskdef name="dbunit" classname="org.dbunit.ant.DbUnitTask" classpathref="ant-jars"/>
+
+    <target name="init" depends="" description="Init build process">
+    	<delete dir="${ws.compile.temp.dir}"/>
+    	<mkdir dir="${ws.compile.temp.dir}"/>
+    	<mkdir dir="${ws.compile.build.dir}"/>
+    	<mkdir dir="${ws.compile.dist.dir}"/>
+    	
+    	<copy toDir="${ws.compile.temp.dir}">
+            <fileset dir="WebContent/" includes="**/*.xml"/>
+            <filterchain>
+                <filterreader classname="org.apache.tools.ant.filters.ExpandProperties"/>
+            </filterchain>
+        </copy>
+    	
+    	<copy toDir="${ws.compile.temp.dir}">
+            <fileset dir="WebContent/" includes="**/*"/>
+        </copy>
+    	
+    	<copy toDir="${ws.compile.temp.dir}/WEB-INF/classes" overwrite="false">
+            <fileset dir="src" includes="**/*.xml"/>
+        </copy>
+        
+    	<copy toDir="${ws.compile.temp.dir}/WEB-INF/classes" overwrite="true">
+            <fileset dir="${ws.compile.buildfiles.dir}" includes="**/*.xml"/>
+            <filterchain>
+                <filterreader classname="org.apache.tools.ant.filters.ExpandProperties"/>
+            </filterchain>
+        </copy>
+    </target>
+    
+	<target name="compile" depends="init"
+            description="Compile main source tree java files into class files, generate jar files">            
+        <javac destdir="${ws.compile.build.dir}" source="${ws.compile.java_version}" target="${ws.compile.java_version}"
+               debug="true" deprecation="false" encoding="ISO-8859-1" optimize="false" failonerror="true" fork="true" memoryinitialsize="256m"
+               memorymaximumsize="512m">
+            <src refid="source-path"/>
+            <classpath refid="external-jars"/>
+            <!--compilerarg value="-Xlint:all"/-->
+            <!--compilerarg value="-Xlint:deprecation"/-->
+            <!--compilerarg value="-Xlint:unchecked"/-->
+        </javac>
+    </target>    
+
+    <target name="build" depends="compile,revision" description="Build web war file">
+        <war destfile="${ws.compile.dist.war-web}" webxml="temp/WEB-INF/web.xml">
+            <lib refid="app-web-jars">
+            </lib>
+            <classes dir="${ws.compile.build.dir}"/>
+            <fileset dir="temp"/>
+        </war>
+    </target> 
+	
+    <target name="clean" depends="" description="Clean output dirs (build, dist)">
+        <delete dir="${ws.compile.dist.dir}"/>
+        <delete dir="${ws.compile.build.dir}"/>
+        <delete dir="${ws.compile.temp.dir}"/>
+    </target>
+  
+    <target name="revision" depends="" description="Create the html revision stamp file">
+        <svn>
+            <status revisionProperty="revision" textStatusProperty="revision_text" path="${basedir}"/>
+        </svn>
+    </target>
+</project>

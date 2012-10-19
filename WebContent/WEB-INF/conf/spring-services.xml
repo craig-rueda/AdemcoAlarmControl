@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+
+	<bean class="com.craigrueda.webkeypad.service.PanelCommServiceImpl"
+		p:nightStayCode-ref="nightStayCode" 
+		p:comPortName-ref="deviceComPort"
+		p:disableJniFeatures-ref="disableJniFeatures"
+	/>
+	
+	<bean id="loginService" class="com.craigrueda.webkeypad.service.LoginServiceImpl" >
+		<property name="userMap">
+			<map>
+				<entry key="<username>" value="<SHA384 + base64 encoded pwd>" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean class="com.craigrueda.webkeypad.service.MessagingServiceImpl">
+		<property name="txtMsgRecips">
+			<list>
+				<value><your number>@txt.att.net</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl"
+		p:host-ref="smtpHost" />
+		
+	<bean class="com.craigrueda.webkeypad.util.SystemErrLog4JWrapper" />
+		
+</beans>
